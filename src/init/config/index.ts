@@ -15,5 +15,5 @@ export interface IDataBaseConfig {
 
 export const database: IDataBaseConfig = {
 	file: "database/medium-lite",
-    pass_salt: "medium-lite-password.uz.com.co.ru.io.net"
+	pass_salt: "medium-lite-password.uz.com.co.ru.io.net"
 };

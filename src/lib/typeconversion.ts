@@ -1,7 +1,7 @@
 export function toNum(data: any): number {
-    return +data;
+	return +data;
 }
 
 export function toStr(data: any): string {
-    return "" + data.toString();
+	return "" + data.toString();
 }

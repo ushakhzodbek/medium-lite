@@ -11,7 +11,7 @@ app.use(express.json());
 app.use("/api/v1", apiv1);
 
 app.listen(
-    config.server.port, 
-    config.server.host, 
-    console.log.bind(void 0, `Server listen on ${config.server.host}:${config.server.port}`)
+	config.server.port, 
+	config.server.host, 
+	console.log.bind(void 0, `Server listen on ${config.server.host}:${config.server.port}`)
 );

@@ -1,3 +1,5 @@
+import { db as database } from "../../../init/database/sqlite";
+
 export interface IPost {
     id: number;
     title: string;
@@ -12,32 +14,31 @@ export interface IUser {
     posts: IPost[];
 }
 
-//! Only For Test
+const table = "posts";
 
-const users: Array<IUser> = [
-    { id: 1, email: "test1@test.com", password: 132456, posts: [] },
-    { id: 2, email: "test2@test.com", password: 132456, posts: [] },
-    { id: 3, email: "test3@test.com", password: 132456, posts: [] },
-];
-
-const posts: Array<IPost> = [
-    { id: 1, title: "1 Post", content: "Hello World!!!", author: users[0] },
-    { id: 2, title: "2 Post", content: "Hello World!!!", author: users[1] },
-    { id: 3, title: "3 Post", content: "Hello World!!!", author: users[2] },
-];
-
-//! Only For Test
-
-export function get(page: number = 0, size: number = 10): Array<IPost> {
-    const offset = page * size;
-    const limit = size;
-    return posts.slice(offset, offset + limit);
+export async function get(page: number = 0, size: number = 10): Promise<Array<IPost>> {
+	const offset = page * size;
+	const limit = size;
+	return await (await database).all(`SELECT id, title, content, reading_time, author, (rating_value / rating_count) as rating FROM ${table} LIMIT ${offset},${limit}`);
 }
 
-export function get_by_id(id: number): IPost {
-    return posts.find(user => user.id === id);
+export async function get_by_id(id: number): Promise<IPost> {
+	return await (await database).get(`SELECT id, title, content, reading_time, author, (rating_value / rating_count) as rating FROM ${table} WHERE id = ${id}`);
 }
 
-export function create(post: IPost): void | Error {
-    posts.push(post);
+export async function create(post: IPost): Promise<void | Error> {
+	const reading_time = Math.round(post.content.split(" ").length / 150);
+	await (await database).run(`INSERT INTO ${table}(id, title, content, reading_time, rating_value, rating_count, author) VALUES (${post.id}, '${post.title}', '${post.content}', ${reading_time}, 0, 0, ${post.author})`);
+}
+
+export async function add_rate(id: number, rate_value: number): Promise<void | Error> {
+	await (await database).run(`UPDATE ${table} SET rating_value = (rating_value + ${rate_value}), rating_count = (rating_count + 1) WHERE id = ${id}`);
+}
+
+export async function get_by_user_id(user_id: number): Promise<Array<IPost>> {
+	return await (await database).all(`SELECT id, title, content, reading_time, author, (rating_value / rating_count) as rating FROM ${table} WHERE author = ${user_id}`);
+}
+
+export async function get_all_posts_rating_by_user_id(user_id: number) {
+	return await (await database).get(`SELECT (sum(rating_value) / sum(rating_count)) as rating FROM ${table} WHERE author = ${user_id}`);
 }

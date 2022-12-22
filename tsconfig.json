@@ -1,14 +1,22 @@
 {
     "compilerOptions": {
+        "rootDir": "./src",
         "outDir": "./dist",
         "noImplicitAny": true,
-        "module": "commonjs",
-        "target": "es5",
+        "module": "CommonJS",
+        "target": "es2022",
+        "lib": ["es2022"],
         "allowJs": true,
         "moduleResolution": "node",
         "esModuleInterop": true,
         "declaration": true,
-        "removeComments": true
+        "removeComments": false,
+        "types": ["node"]
     },
-    "exclude": ["node_modules"]
+    "exclude": [
+        "node_modules",
+        "dist",
+        "database",
+        "webpack.config.cjs"
+    ]
 }

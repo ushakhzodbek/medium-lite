@@ -1,3 +1,8 @@
+import crypto from "node:crypto";
+import { toStr } from "../../../lib/typeconversion";
+
+import { db as database } from "../../../init/database/sqlite";
+
 export interface IPost {
     id: number;
     title: string;
@@ -12,26 +17,19 @@ export interface IUser {
     posts: IPost[];
 }
 
-//! Only For Test
+const table = "users";
 
-const users: Array<IUser> = [
-    { id: 1, email: "test1@test.com", password: 132456, posts: [] },
-    { id: 2, email: "test2@test.com", password: 132456, posts: [] },
-    { id: 3, email: "test3@test.com", password: 132456, posts: [] },
-];
-
-//! Only For Test
-
-export function get(page: number = 0, size: number = 10): Array<IUser> {
+export async function get(page: number = 0, size: number = 10): Promise<Array<IUser>> {
     const offset = page * size;
     const limit = size;
-    return users.slice(offset, offset + limit);
+    return await (await database).all(`SELECT id, email FROM ${table} LIMIT ${offset},${limit}`);
 }
 
-export function get_by_id(id: number): IUser {
-    return users.find(user => user.id === id);
+export async function get_by_id(id: number): Promise<IUser> {
+    return await (await database).get(`SELECT id, email FROM ${table} WHERE id = ${id}`);
 }
 
-export function create(user: IUser): void | Error {
-    users.push(user);
+export async function create(user: IUser): Promise<void | Error> {
+    const password = BigInt("0x" + crypto.createHash('sha256').update(toStr(user.password)).digest("hex")).toString(10);
+    await (await database).run(`INSERT INTO ${table}(id, email, password) VALUES (${user.id}, '${user.email}', ${password})`);
 }

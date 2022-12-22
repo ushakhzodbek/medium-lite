@@ -10,8 +10,10 @@ export const server: IServerConfig = {
 
 export interface IDataBaseConfig {
     file: string;
+    pass_salt: string;
 }
 
 export const database: IDataBaseConfig = {
-	file: ""
+	file: "database/medium-lite",
+    pass_salt: "medium-lite-password.uz.com.co.ru.io.net"
 };

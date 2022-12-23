@@ -35,8 +35,10 @@ export async function add_rate(id: number, rate_value: number): Promise<void | E
 	await (await database).run(`UPDATE ${table} SET rating_value = (rating_value + ${rate_value}), rating_count = (rating_count + 1) WHERE id = ${id}`);
 }
 
-export async function get_by_user_id(user_id: number): Promise<Array<IPost>> {
-	return await (await database).all(`SELECT id, title, content, reading_time, author, (rating_value / rating_count) as rating FROM ${table} WHERE author = ${user_id}`);
+export async function get_by_user_id(user_id: number, page: number = 0, size: number = 10): Promise<Array<IPost>> {
+	const offset = page * size;
+	const limit = size;
+	return await (await database).all(`SELECT id, title, content, reading_time, author, (rating_value / rating_count) as rating FROM ${table} WHERE author = ${user_id} LIMIT ${offset},${limit}`);
 }
 
 export async function get_all_posts_rating_by_user_id(user_id: number) {

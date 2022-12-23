@@ -1,7 +1,10 @@
 import { Router } from "express";
+import jwt from "jsonwebtoken";
 import { toNum, toStr } from "../../../lib/typeconversion";
 
-import { create, get, get_by_id } from "../../../core/model/user";
+import * as config from "../../../init/config";
+
+import { create, get, get_by_id, check } from "../../../core/model/user";
 import { get_all_posts_rating_by_user_id, get_by_user_id } from "../../../core/model/post";
 
 export const router = Router();
@@ -27,4 +30,11 @@ router.post("/", async (req, res) => {
 	const id = toNum(toStr(Math.random()).slice(2));
 	await create({ ...data, id });
 	res.send({ id });
+});
+
+router.post("/auth", async (req, res) => {
+	const { email, password }: any = req.body;
+	const { id } = await check(email, password);
+	const access_token = jwt.sign({ user_id: id }, config.jwt.secret, { expiresIn: "1800s" });
+	res.send({ access_token });
 });

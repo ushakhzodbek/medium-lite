@@ -33,3 +33,8 @@ export async function create(user: IUser): Promise<void | Error> {
 	const password = BigInt("0x" + crypto.createHash("sha256").update(toStr(user.password)).digest("hex")).toString(10);
 	await (await database).run(`INSERT INTO ${table}(id, email, password) VALUES (${user.id}, '${user.email}', ${password})`);
 }
+
+export async function check(email: string, password: number): Promise<IUser> {
+    const hahsing_password = BigInt("0x" + crypto.createHash("sha256").update(toStr(password)).digest("hex")).toString(10);
+    return await (await database).get(`SELECT id, email FROM ${table} WHERE email = '${email}' AND password = ${hahsing_password}`);
+}
